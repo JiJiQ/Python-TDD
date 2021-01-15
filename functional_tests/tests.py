@@ -1,10 +1,11 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 
 import time
 
-class NewViewerTest(unittest.TestCase):
+class NewViewerTest(LiveServerTestCase):
     def setUp(self):
         self.browser=webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
     def tearDown(self):
@@ -32,7 +33,5 @@ class NewViewerTest(unittest.TestCase):
         table=self.browser.find_element_by_id('id_list_table')
         self.check_for_row_in_list_table("1:Buy peacock feathers")
         self.check_for_row_in_list_table("2:Use peacock feathers to make a fly")
+        self.browser.get(self.live_server_url)
         self.fail('Finish the test!')
-
-if __name__=='__main__':
-    unittest.main()
