@@ -6,7 +6,6 @@ import time
 
 MAX_WAIT=10
 class NewViewerTest(LiveServerTestCase):
-
     def setUp(self):
         self.browser=webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
     def tearDown(self):
