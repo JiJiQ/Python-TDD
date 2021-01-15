@@ -1,16 +1,13 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
 
 import time
 
 class NewViewerTest(LiveServerTestCase):
+    #必须使用默认的tearDown方法，否则不会自动删除临时数据库
     def setUp(self):
         self.browser=webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
-    def tearDown(self):
-        self.browser.quit()
-
     def check_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
         rows = self.browser.find_elements_by_tag_name('tr')
@@ -34,4 +31,5 @@ class NewViewerTest(LiveServerTestCase):
         self.check_for_row_in_list_table("1:Buy peacock feathers")
         self.check_for_row_in_list_table("2:Use peacock feathers to make a fly")
         self.browser.get(self.live_server_url)
+        self.browser.close()
         self.fail('Finish the test!')
