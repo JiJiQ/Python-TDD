@@ -23,6 +23,7 @@ def _get_latest_source(source_folder):
         run(f'cd {source_folder} && git fetch')
     else:
         run(f'git clone {REPO_URL} {source_folder}')
+    #获取本地最近一次提交
     current_commit=local('git log -n 1 --format=%H',capture=True)
     run(f'cd {source_folder} '
         f'&& git checkout master '

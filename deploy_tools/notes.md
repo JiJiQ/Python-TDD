@@ -19,5 +19,8 @@
 ##Systemd服务
 * 参考gunicorn-systemd.template.service
 
-##deploy
+##自动部署
+* 构建fabric脚本完成站点目录创建->获取最新代码->更新django的设置文件、站点数据库，创建站点虚拟环境，收集站点静态文件，创建nginx虚拟站点配置和systemd服务
+* 幂等性：nginx站点配置模板和gunicorn-systemd配置模板文件中的站点名称应为SITENAME，使用fabric脚本中替换为具体站点名称
+##问题记录
 fatal: Could not parse object:commitid(本地代码未提交导致)
