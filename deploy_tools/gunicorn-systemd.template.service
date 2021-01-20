@@ -1,11 +1,11 @@
 [Unit]
-Description=Gunicorn server for superlists.jijunqing.online
+Description=Gunicorn server for SITENAME
 [Service]
 Restart=on-failure
 User=root
-WorkingDirectory=/home/work/superlists.jijunqing.online/source
-ExecStart=/home/work/superlists.jijunqing.online/virtualenv/bin/gunicorn \
-                 --bind unix:/tmp/superlists.jijunqing.online \
+WorkingDirectory=/home/work/SITENAME/source
+ExecStart=/home/work/SITENAME/virtualenv/bin/gunicorn \
+                 --bind unix:/tmp/SITENAME \
                  TDD.wsgi:application
 [Install]
 WantedBy=multi-user.target

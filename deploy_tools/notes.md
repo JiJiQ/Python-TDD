@@ -18,3 +18,6 @@
 
 ##Systemd服务
 * 参考gunicorn-systemd.template.service
+
+##deploy
+fatal: Could not parse object:commitid(本地代码未提交导致)
