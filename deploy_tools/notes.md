@@ -33,3 +33,4 @@ escape:字符串转义成html协议下的字符串
 ## Django高级应用
 * 命名视图，在模板文件里使用{% url %}标签指定视图的路由
 * 在模型中定义get_absolute_url方法，get_absolute_url方法中指定视图名并传参，redirect(model对象)就可以重定向到model数据对应的路由
+* 视图和模板中应用表单，当输入不符合时，form的errors不为空，显示错误提示
