@@ -24,3 +24,5 @@
 * 幂等性：nginx站点配置模板和gunicorn-systemd配置模板文件中的站点名称应为SITENAME，使用fabric脚本中替换为具体站点名称
 ##问题记录
 fatal: Could not parse object:commitid(本地代码未提交导致)
+full_clean:模型全字段校验
+escape:字符串转义成html协议下的字符串
