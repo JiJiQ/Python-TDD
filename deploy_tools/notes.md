@@ -26,3 +26,6 @@
 fatal: Could not parse object:commitid(本地代码未提交导致)
 full_clean:模型全字段校验
 escape:字符串转义成html协议下的字符串
+
+## TDD思想
+* 事不过三，三则重构
