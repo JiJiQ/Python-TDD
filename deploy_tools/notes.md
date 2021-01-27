@@ -43,3 +43,6 @@ escape:字符串转义成html协议下的字符串
 * ordering(),按照指定字段排序
 * model A的外键B，可调用B.A_set方法返回指定B字段的所有A
 * 反向查询reverse('url_name',args=[a])，可以传参args得到指定url_name的路由
+
+## 使用过的django断言
+* assertRedirects(response,'/')
