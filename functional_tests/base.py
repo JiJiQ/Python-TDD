@@ -41,7 +41,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.wait_for_row_in_list_table(f'{item_number}:{item_text}')
     @wait
     def wait_for(self, fn):
-        return fn
+        return fn()
 
     @wait
     def wait_for_row_in_list_table(self, row_text):
