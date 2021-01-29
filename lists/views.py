@@ -29,5 +29,7 @@ def new_lists(request):
     else:
         return render(request,'home.html',{"form":form})
 def my_lists(request,email):
-    owner=User.objects.get(email=email)
-    return render(request,'my_lists.html',{'owner':owner})
+    if request.user.is_authenticated:
+        owner=User.objects.get(email=email)
+        return render(request,'my_lists.html',{'owner':owner})
+    return render(request,'my_lists.html',{'error_message':f'{email} not logged in'})

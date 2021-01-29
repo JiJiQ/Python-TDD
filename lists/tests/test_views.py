@@ -125,12 +125,19 @@ class NewListTest(TestCase):
         self.assertEqual(list_.owner,user)
 class MyListsTest(TestCase):
     def test_my_lists_url_renders_my_lists_template(self):
-        User.objects.create(email='a@b.com')
+        user=User.objects.create(email='a@b.com')
+        self.client.force_login(user)
         response=self.client.get('/lists/user/a@b.com/')
         self.assertTemplateUsed(response,'my_lists.html')
     def test_passes_correct_owner_to_template(self):
-        User.objects.create(email='wrong@owner.com')
+        user=User.objects.create(email='wrong@owner.com')
+        self.client.force_login(user)
         correct_user=User.objects.create(email='a@b.com')
         response=self.client.get('/lists/user/a@b.com/')
         self.assertEqual(response.context['owner'],correct_user)
+    def test_show_error_if_user_not_logged_in(self):
+        email='a@b.com'
+        User.objects.create(email=email)
+        response=self.client.get('/lists/user/a@b.com/')
+        self.assertIn(f'{email} not logged in',response.content.decode())
 

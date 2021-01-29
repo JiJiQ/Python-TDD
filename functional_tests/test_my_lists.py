@@ -33,3 +33,13 @@ class MyListsTest(FunctionalTest):
         self.wait_for(lambda : self.assertEqual(self.browser.current_url,second_list_url))
         self.browser.find_element_by_link_text('Log out').click()
         self.wait_for(lambda : self.assertEqual(self.browser.find_elements_by_link_text('My lists'),[]))
+    def test_no_item_if_not_logged(self):
+        self.create_pre_authenticated_session('edith@example.com')
+        self.browser.get(self.live_server_url)
+        self.add_lists_item('item1')
+        list_url=self.browser.current_url
+        self.browser.find_element_by_link_text('Log out').click()
+        self.browser.get(list_url)
+        table=self.browser.find_element_by_id('id_list_table')
+        rows=table.find_elements_by_tag_name('tr')
+        self.wait_for(lambda :self.assertNotIn('1:item1',[row.text for row in rows]))
