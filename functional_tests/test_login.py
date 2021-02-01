@@ -1,7 +1,7 @@
 from selenium.webdriver.common.keys import Keys
 from django.core import mail
 from .base import FunctionalTest
-import re
+import re,time
 TEST_EMAIL='1319256473@qq.com'
 SUBJECT='Your login link for Superlists'
 
