@@ -22,7 +22,7 @@ def wait(fn):
     return modified_fn
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
-        self.browser = webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
+        self.browser = webdriver.Firefox()
         staging_server = os.environ.get('STAGING_SERVER')
         if staging_server:
             self.live_server_url = 'http://' + staging_server
@@ -41,7 +41,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.wait_for_row_in_list_table(f'{item_number}:{item_text}')
     @wait
     def wait_for(self, fn):
-        return fn
+        return fn()
 
     @wait
     def wait_for_row_in_list_table(self, row_text):
