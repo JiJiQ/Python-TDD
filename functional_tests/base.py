@@ -33,7 +33,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser.get(self.live_server_url+"/404_no_such_url")
         self.browser.add_cookie(dict(name=settings.SESSION_COOKIE_NAME,value=session.session_key,path='/',))
     def setUp(self):
-        self.browser = webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
+        self.browser = webdriver.Firefox()
         staging_server = os.environ.get('STAGING_SERVER')
         if staging_server:
             self.live_server_url = 'http://' + staging_server
