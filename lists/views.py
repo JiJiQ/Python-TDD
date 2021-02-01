@@ -16,7 +16,9 @@ def view_lists(request,list_id):
         if form.is_valid():
             form.save()
             return redirect(list_)
-    return render(request, 'list.html', {'list': list_,'form':form})
+    if request.user.is_authenticated:
+        return render(request, 'list.html', {'list': list_,'form':form})
+    return render(request,'my_lists.html',{'error_message':"You can't get item with not log in",'form':form})
 def new_lists(request):
     form=ItemForm(data=request.POST)
     if form.is_valid():
@@ -29,5 +31,7 @@ def new_lists(request):
     else:
         return render(request,'home.html',{"form":form})
 def my_lists(request,email):
-    owner=User.objects.get(email=email)
-    return render(request,'my_lists.html',{'owner':owner})
+    if request.user.is_authenticated:
+        owner=User.objects.get(email=email)
+        return render(request,'my_lists.html',{'owner':owner})
+    return render(request,'my_lists.html',{'error_message':f'{email} not logged in'})
