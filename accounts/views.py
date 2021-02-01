@@ -18,8 +18,8 @@ def send_login_email(request):
 def login(request):
     user=auth_obj.authenticate(uid=request.GET.get('token'))
     if user:
-        auth.login(request,user)
+        auth_obj.login(request,user)
     return redirect('/')
 def logout(request):
-    auth.logout(request)
+    auth_obj.logout(request)
     return redirect('/')
