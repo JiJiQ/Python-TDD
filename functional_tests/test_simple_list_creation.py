@@ -31,6 +31,7 @@ class NewViewerTest(FunctionalTest):
         self.assertRegex(edith_list_url,'/lists/.+')
         self.browser.quit()
         self.browser=webdriver.Chrome(executable_path="D:\\TDD\\test\\chromedriver.exe")
+        self.create_pre_authenticated_session('other@example.com')
         self.browser.get(self.live_server_url)
         page_text=self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers',page_text)

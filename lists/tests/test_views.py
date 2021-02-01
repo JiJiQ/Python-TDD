@@ -19,51 +19,60 @@ class HomePageTest(TestCase):
         reponse=self.client.get('/')
         self.assertIsInstance(reponse.context['form'],ItemForm)
 class ListViewTest(TestCase):
+    def force_log_in(self):
+        user=User.objects.create(email='test@b.com')
+        self.client.force_login(user)
+        return user
     def test_uses_list_template(self):
-        list_=List.objects.create()
+        user=self.force_log_in()
+        list_=List.objects.create(owner=user)
         response=self.client.get(f'/lists/{list_.id}/')
         self.assertTemplateUsed(response,'list.html')
     def test_passes_correct_list_to_template(self):
-        other_list=List.objects.create()
-        correct_list=List.objects.create()
+        user=self.force_log_in()
+        other_list=List.objects.create(owner=user)
+        correct_list=List.objects.create(owner=user)
         response=self.client.get(f'/lists/{correct_list.id}/')
         self.assertEqual(response.context['list'],correct_list)
     def test_can_save_a_Post_request_to_an_existing_list(self):
-        other_list=List.objects.create()
-        correct_list=List.objects.create()
+        user=self.force_log_in()
+        other_list=List.objects.create(owner=user)
+        correct_list=List.objects.create(owner=user)
         self.client.post(f'/lists/{correct_list.id}/',data={'text':'A new item for an existing list'})
         self.assertEqual(Item.objects.count(),1)
         new_item=Item.objects.first()
         self.assertEqual(new_item.text,'A new item for an existing list')
         self.assertEqual(new_item.list,correct_list)
     def test_POST_redirects_to_list_view(self):
-        other_list=List.objects.create()
-        correct_list=List.objects.create()
+        user=self.force_log_in()
+        other_list=List.objects.create(owner=user)
+        correct_list=List.objects.create(owner=user)
 
         reponse=self.client.post(f'/lists/{correct_list.id}/',data={'text':'A new item for an existing list'})
         self.assertRedirects(reponse,f'/lists/{correct_list.id}/')
     def test_displays_item_form(self):
-        list_=List.objects.create()
+        user=self.force_log_in()
+        list_=List.objects.create(owner=user)
         response=self.client.get(f'/lists/{list_.id}/')
         self.assertIsInstance(response.context['form'],ExistingListItemForm)
         self.assertContains(response,'name="text"')
     def test_displays_only_items_for_that_list(self):
-            correct_list = List.objects.create()
-            Item.objects.create(text='itemey 1', list=correct_list)
-            Item.objects.create(text='itemey 2', list=correct_list)
+        user=self.force_log_in()
+        correct_list = List.objects.create(owner=user)
+        Item.objects.create(text='itemey 1', list=correct_list)
+        Item.objects.create(text='itemey 2', list=correct_list)
+        other_list = List.objects.create(owner=user)
+        Item.objects.create(text='other list item 1', list=other_list)
+        Item.objects.create(text='other list item 2', list=other_list)
+        response = self.client.get(f'/lists/{correct_list.id}/')
 
-            other_list = List.objects.create()
-            Item.objects.create(text='other list item 1', list=other_list)
-            Item.objects.create(text='other list item 2', list=other_list)
-
-            response = self.client.get(f'/lists/{correct_list.id}/')
-
-            self.assertContains(response, 'itemey 1')
-            self.assertContains(response, 'itemey 2')
-            self.assertNotContains(response, 'other list item 1')
-            self.assertNotContains(response, 'other list item 2')
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
+        self.assertNotContains(response, 'other list item 1')
+        self.assertNotContains(response, 'other list item 2')
     def post_invalid_input(self):
-        list_=List.objects.create()
+        user=self.force_log_in()
+        list_=List.objects.create(owner=user)
         return self.client.post(f'/lists/{list_.id}/',data={'text':''})
     def test_for_invalid_input_nothing_saved_to_db(self):
         self.post_invalid_input()
@@ -79,13 +88,23 @@ class ListViewTest(TestCase):
         response=self.post_invalid_input()
         self.assertContains(response,escape(EMPTY_ITEM_ERROR))
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
-        list1=List.objects.create()
+        user=self.force_log_in()
+        list1=List.objects.create(owner=user)
         item1=Item.objects.create(list=list1,text='textey')
         response=self.client.post(f'/lists/{list1.id}/',data={'text':'textey'})
         expected_error=escape(DUPLICATE_ITEM_ERROR)
         self.assertContains(response,expected_error)
         self.assertTemplateUsed(response,'list.html')
         self.assertEqual(Item.objects.all().count(),1)
+    def test_show_error_if_not_log_in(self):
+        user=User.objects.create(email='a@b.com')
+        list_=List()
+        list_.owner=user
+        list_.save()
+        Item.objects.create(text='item1',list=list_)
+        response=self.client.get(f'/lists/{list_.id}/')
+        self.assertNotIn('item1',response.content.decode())
+        self.assertIn(escape("You can't get item with not log in"),response.content.decode())
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
         self.client.post('/lists/new',data={'text':'A new list item'})
@@ -125,12 +144,18 @@ class NewListTest(TestCase):
         self.assertEqual(list_.owner,user)
 class MyListsTest(TestCase):
     def test_my_lists_url_renders_my_lists_template(self):
-        User.objects.create(email='a@b.com')
+        user=User.objects.create(email='a@b.com')
+        self.client.force_login(user)
         response=self.client.get('/lists/user/a@b.com/')
         self.assertTemplateUsed(response,'my_lists.html')
     def test_passes_correct_owner_to_template(self):
-        User.objects.create(email='wrong@owner.com')
+        user=User.objects.create(email='wrong@owner.com')
+        self.client.force_login(user)
         correct_user=User.objects.create(email='a@b.com')
         response=self.client.get('/lists/user/a@b.com/')
         self.assertEqual(response.context['owner'],correct_user)
-
+    def test_show_error_if_user_not_logged_in(self):
+        email='a@b.com'
+        User.objects.create(email=email)
+        response=self.client.get('/lists/user/a@b.com/')
+        self.assertIn(f'{email} not logged in',response.content.decode())
