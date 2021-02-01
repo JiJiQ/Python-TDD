@@ -2,10 +2,14 @@
 {% block header_text %}My Lists{% endblock %}
 {% block list_form %}{% endblock %}
 {% block extra_content %}
-    <h2>{{ owner.email }}'s lists</h2>
-    <ul>
-        {% for list in owner.list_set.all %}
-            <li><a href="{{list.get_absolute_url}}">{{list.name}}</a> </li>
-        {% endfor %}
-    </ul>
+    {% if owner %}
+        <h2>{{ owner.email }}'s lists</h2>
+        <ul>
+            {% for list in owner.list_set.all %}
+                <li><a href="{{list.get_absolute_url}}">{{list.name}}</a> </li>
+            {% endfor %}
+        </ul>
+    {% elif error_message %}
+        <h2>{{error_message}}</h2>
+    {% endif %}
 {% endblock %}
