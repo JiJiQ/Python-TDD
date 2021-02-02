@@ -48,7 +48,8 @@ escape:字符串转义成html协议下的字符串
 ## 使用过的django断言
 * assertRedirects(response,'/')
 
-## 安装jenkins过程中遇到的问题-解决
+## jenkins使用过程中遇到的问题-解决
 * 密钥下载失败-多重试几次并且不要对系统文件做任何的修改
 * 默认8080端口被占用-/etc/default/jenkins中更改默认端口
 * 提示目录设置错误（status=7）启动失败-jdk找不到，安装jdk后在update-alternatives中注册：update-alternatives --config java
+* jenkins构建运行selenium自动化测试时报错Xfvb找不到-在“全局工具配置”中配置Xfvb的name与path
