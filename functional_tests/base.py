@@ -6,8 +6,10 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 import time
+from datetime import datetime
 import os
 MAX_WAIT=10
+SCREEN_DUMP_LOCATION=os.path.join(os.path.dirname(os.path.abspath(__file__)),'screendumps')
 
 User=get_user_model()
 def wait(fn):
@@ -32,6 +34,28 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         self.browser.get(self.live_server_url+"/404_no_such_url")
         self.browser.add_cookie(dict(name=settings.SESSION_COOKIE_NAME,value=session.session_key,path='/',))
+    def _get_filename(self):
+        timestamp=datetime.now().isoformat().replace(':','.')[:19]
+
+        return '{folder}/{classname}.{method}-window{windowid}-{timestamp}'.format(
+            folder=SCREEN_DUMP_LOCATION,
+            classname=self.__class__.__name__,
+            method=self._testMethodName,
+            windowid=self._windowid,
+            timestamp=timestamp
+        )
+
+    def _test_has_failed(self):
+        return any(error for (method,error) in self._outcome.errors)
+    def take_screenshot(self):
+        filename=self._get_filename()+'.png'
+        print('screenshottind to',filename)
+        self.browser.get_screenshot_as_file(filename)
+    def dump_html(self):
+        filename=self._get_filename()+'.html'
+        print('dump page HTML to',filename)
+        with open(filename,'w')as f:
+            f.write(self.browser.page_source)
     def setUp(self):
         self.browser = webdriver.Firefox()
         staging_server = os.environ.get('STAGING_SERVER')
@@ -39,8 +63,16 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.live_server_url = 'http://' + staging_server
         self.create_pre_authenticated_session('edith@example.com')
     def tearDown(self):
+        if self._test_has_failed():
+            if not os.path.exists(SCREEN_DUMP_LOCATION):
+                os.makedirs(SCREEN_DUMP_LOCATION)
+            for ix,handle in enumerate(self.browser.window_handles):
+                self._windowid=ix
+                self.browser.switch_to.window(handle)
+                self.take_screenshot()
+                self.dump_html()
         self.browser.quit()
-
+        super().tearDown()
     def get_item_input_box(self):
         return self.browser.find_element_by_id('id_text')
 
