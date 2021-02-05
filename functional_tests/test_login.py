@@ -30,5 +30,3 @@ class LoginTest(FunctionalTest):
         self.browser.find_element_by_link_text('Log out').click()
 
         self.wait_to_be_logged_out(email=TEST_EMAIL)
-
-        self.fail('1')
